@@ -545,7 +545,7 @@ exports.getAllStudentForAttendance = async(req,res)=>{
     const {subjectId} = req.params;
     const sub = await Subject.findOne({_id:subjectId});
     const cls = sub.class;
-    const response = await Class.findOne({_id:cls}).populate("students","name ID").select("stident");
+    const response = await Class.findOne({_id:cls}).populate("students","name ID").select("student");
     res.status(200).json({
       success:true,
       response,
@@ -556,5 +556,79 @@ exports.getAllStudentForAttendance = async(req,res)=>{
   catch(err){
     console.error(err);
     res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}
+
+
+
+
+//teacher get all student with percentage
+
+exports.teacherStudentAttendance = async(req,res)=>{
+  try{
+    const {subjectId} = req.params;
+    const sub = await Subject.findOne({_id:subjectId});
+    if(!sub){
+      res.status(404).json({
+        success:false,
+        message:"subject not found"
+      })
+    }
+    const clsId = sub.class;
+    const students = await Class.findOne({_id:clsId}).populate("students","name").select("students");
+
+    console.log(students.students);
+
+    if(!students){
+      res.status(404).json({
+        success:false,
+        message:"no student found"
+      })
+    }
+
+
+    const StuAttendance = [];
+
+    for(let stu of students.students){
+      const studentSub = await StudentAttendance.findOne({ subject: subjectId , student:stu._id });
+      const studentName = stu.name;
+      if(studentSub){
+        const totalClass = studentSub.totalClasses;
+        const attendedClass = studentSub.attendedClasses;
+  
+        const attendancePercentage = totalClass === 0 ? -1 : ((attendedClass / totalClass) * 100).toFixed(2);
+  
+        StuAttendance.push({
+          studentName,
+          totalClass,
+          attendedClass,
+          attendancePercentage: `${attendancePercentage}%`
+        });
+      }
+      else{
+        StuAttendance.push({
+          studentName,
+          totalClass:0,
+          attendedClass:0,
+          attendancePercentage:"Not started"
+        });
+      }
+    }
+      res.status(200).json({
+      success:true,
+      StuAttendance,
+      message:"data fetched"
+    })
+
+
+
+
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).json({
+      success:false,
+      message:"internal server error"
+    })
   }
 }

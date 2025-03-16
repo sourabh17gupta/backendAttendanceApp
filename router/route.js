@@ -6,7 +6,7 @@ const {Signup} = require("../controllers/Signup");
 const {Login} = require("../controllers/Login");
 const {auth,isTeacher,isAdmin} = require("../middlewares/auth");
 const {CreateClass,getClass,addStudent,removeStudent,getStudent,createSubject,getSubject,getSubjectsForTeacher
-    ,createAnnouncement,getAnnouncement,takeAttendance,getStudentSubjectsWithAttendance,getAllStudentForAttendance,removeStudent1} = require("../controllers/Class");
+    ,createAnnouncement,getAnnouncement,takeAttendance,getStudentSubjectsWithAttendance,getAllStudentForAttendance,removeStudent1,teacherStudentAttendance} = require("../controllers/Class");
 
 router.post("/signup",Signup);
 router.post("/login",Login);
@@ -24,6 +24,6 @@ router.post("/createAnnouncement/:teacherId/:subjectId",auth,isTeacher,createAnn
 router.post("/takeAttendance/:subjectId/:teacherId",auth,isTeacher,takeAttendance);
 router.get("/getStudentSubjectsWithAttendance/:studentId",auth,getStudentSubjectsWithAttendance);
 router.get("/getAllStudentForAttendance/:subjectId",auth,getAllStudentForAttendance);
-
+router.get("/teacherStudentAttendance/:subjectId",auth,teacherStudentAttendance);
 
 module.exports = router;
