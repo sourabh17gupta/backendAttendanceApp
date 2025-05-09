@@ -243,6 +243,12 @@ exports.removeStudent1 = async (req, res) => {
                message:"teacher not exist"
             })
         }
+        if(teacher.role!=="teacher"){
+          return res.status(404).json({
+            success:false,
+            message:"not a teacher"
+         })
+        }
         //check valid class
         const cls = await Class.findOne({_id:classId});
         if(!cls){
